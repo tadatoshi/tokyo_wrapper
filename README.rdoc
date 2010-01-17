@@ -8,9 +8,15 @@
 
   rufus-tokyo is "ffi based ruby library to access Tokyo Cabinet and Tokyo Tyrant" by John Mettraux (Copyright (c) 2009-2010, see http://github.com/jmettraux/rufus-tokyo/blob/master/LICENSE.txt).
 
+== Required Ruby Gems
+
+  rufus-tokyo 1.0.1 or above. 
+
+  sudo gem install rufus-tokyo --source http://gemcutter.org
+
 == Install
 
-  gem install tokyo_wrapper
+  sudo gem install tokyo_wrapper --source http://gemcutter.org
 
 == Licence
 
