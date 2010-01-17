@@ -1,3 +1,5 @@
+require 'rake'
+
 Gem::Specification.new do |s|  
   s.name = %q{tokyo_wrapper}  
   s.version = "0.1.0"  
@@ -8,13 +10,14 @@ Gem::Specification.new do |s|
   s.description = %q{Collection of convenient methods written on the top of rufus/tokyo to access Tokyo Cabinet}  
   s.email = %q{tadatoshi.3.takahashi@gmail.com}  
   s.extra_rdoc_files = ["README.rdoc", "lib/tokyo_wrapper.rb"]  
-  s.files = ["Manifest", "README.rdoc", "Rakefile", "lib/tokyo_wrapper.rb", "tokyo_wrapper.gemspec"]  
+  # s.files = ["README.rdoc", "Rakefile", "lib/tokyo_wrapper.rb", "tokyo_wrapper.gemspec"] 
+  s.files = FileList['init.rb', 'lib/**/*.rb', '[A-Z]*', 'spec/**/*'].to_a  
   s.has_rdoc = true
   s.homepage = %q{http://github.com/tadatoshi/tokyo_wrapper}  
   s.rdoc_options = ["--line-numbers", "--inline-source", "--title", "Tokyo Wrapper", "--main", "README.rdoc"]  
   s.require_paths = ["lib"]  
   s.rubyforge_project = %q{tokyo_wrapper}  
-  s.rubygems_version = %q{1.3.4}  
+  s.rubygems_version = %q{1.3.5}  
   s.summary = %q{Collection of convenient methods written on the top of rufus/tokyo to access Tokyo Cabinet}  
 
   if s.respond_to? :specification_version then  
