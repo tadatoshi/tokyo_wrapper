@@ -27,18 +27,30 @@ module TokyoWrapper
   
     def add(params = {})
       id = @table.generate_unique_id
-      @table[id] = params
+      @table[id] = convert_params(params)
       id
     end
   
     def update(id, params)
       if !@table[id.to_s].nil? && !@table[id.to_s].empty?
-        @table[id.to_s] = @table[id.to_s].merge(params)
+        @table[id.to_s] = @table[id.to_s].merge(convert_params(params))
         true
       else
         false
       end
     end    
+
+    def add_association_id(id, association_id_name, association_id) 
+      if !@table[id.to_s].nil? && !@table[id.to_s].empty?
+        association_ids_string = @table[id.to_s]["#{association_id_name}s"]
+        unless association_ids_string.split(",").include?(association_id.to_s)
+          @table[id.to_s] = @table[id.to_s].merge({"#{association_id_name}s" => "#{association_ids_string},#{association_id}"})
+        end
+        true
+      else
+        false
+      end      
+    end
   
     def all
       @table.query
@@ -47,6 +59,19 @@ module TokyoWrapper
     def find(id)
       @table[id.to_s]
     end
+    
+    private
+      # 
+      # rufus-tokyo converts array to string without a delimiter e.g. It converts [1,2,3,4] to "1234". 
+      # So the array needs to be converted to the comma separated string before being added. e.g. "1,2,3,4"
+      #
+      def convert_params(params)
+        params.each do |key, value|
+          if value.instance_of?(Array)
+            params[key] = value.join(",")
+          end
+        end
+      end
     
   end
 
