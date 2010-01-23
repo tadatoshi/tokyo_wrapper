@@ -12,7 +12,7 @@ describe TokyoWrapper::TableMethods::Associations do
     clear_table(@table_file)
   end
   
-  context "One-to-many and many-to-many associations" do 
+  context "has_many associations" do 
     
     it "should convert array parameter value to joined comma-separated string" do
       
@@ -250,6 +250,150 @@ describe TokyoWrapper::TableMethods::Associations do
       ensure
         read_table.close unless read_table.nil?
       end      
+      
+    end
+    
+  end
+  
+  context "belongs_to associations" do
+    
+    it "should set belongs_to association id (integer)" do
+      
+      begin
+        write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock(@table_file)
+      
+        data_hash = {"street" => "1111 Main", 
+                     "city" => "Montreal", 
+                     "notes" => "Some notes"}
+        id = write_table.add(data_hash)
+      ensure
+        write_table.close unless write_table.nil?
+      end
+      
+      begin
+        read_table = TokyoWrapper::Table.create_with_read_non_locking(@table_file)
+                                      
+        read_table.find(id).should == {"street" => "1111 Main", 
+                                       "city" => "Montreal", 
+                                       "notes" => "Some notes"}  
+      ensure                      
+        read_table.close unless read_table.nil?
+      end                           
+        
+      begin                           
+        write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock(@table_file)                            
+                                 
+        result_1 = write_table.set_belongs_to_association_id(id, "register_id", 78)
+        result_1.should be_true
+      ensure
+        write_table.close unless write_table.nil?
+      end
+      
+      begin
+        read_table = TokyoWrapper::Table.create_with_read_non_locking(@table_file)
+      
+        read_table.find(id).should == {"street" => "1111 Main", 
+                                       "city" => "Montreal", 
+                                       "notes" => "Some notes", 
+                                       "register_id" => "78"}  
+      ensure        
+        read_table.close unless read_table.nil?
+      end                              
+      
+    end
+    
+    it "should set belongs_to association id (string)" do
+      
+      begin
+        write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock(@table_file)
+      
+        data_hash = {"street" => "1111 Main", 
+                     "city" => "Montreal", 
+                     "notes" => "Some notes"}
+        id = write_table.add(data_hash)
+      ensure
+        write_table.close unless write_table.nil?
+      end
+      
+      begin
+        read_table = TokyoWrapper::Table.create_with_read_non_locking(@table_file)
+                                      
+        read_table.find(id).should == {"street" => "1111 Main", 
+                                       "city" => "Montreal", 
+                                       "notes" => "Some notes"}  
+      ensure                      
+        read_table.close unless read_table.nil?
+      end                           
+        
+      begin                           
+        write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock(@table_file)                            
+                                 
+        result_1 = write_table.set_belongs_to_association_id(id, "register_id", "78")
+        result_1.should be_true
+      ensure
+        write_table.close unless write_table.nil?
+      end
+      
+      begin
+        read_table = TokyoWrapper::Table.create_with_read_non_locking(@table_file)
+      
+        read_table.find(id).should == {"street" => "1111 Main", 
+                                       "city" => "Montreal", 
+                                       "notes" => "Some notes", 
+                                       "register_id" => "78"}  
+      ensure        
+        read_table.close unless read_table.nil?
+      end                              
+      
+    end
+    
+    it "should get all the keys for the rows associated with the belongs_to association_id" do
+      
+      begin
+        write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock(@table_file)
+      
+        data_hash_1 = {"street" => "1111 Main", 
+                       "city" => "Montreal", 
+                       "notes" => "Some notes", 
+                       "register_id" => "45"}
+        id_1 = write_table.add(data_hash_1)
+        data_hash_2 = {"city" => "Montreal", 
+                       "province" => "Quebec", 
+                       "notes" => "Another notes", 
+                       "register_id" => "45"}
+        id_2 = write_table.add(data_hash_2)
+        data_hash_3 = {"street" => "1111 Main", 
+                       "city" => "Montreal", 
+                       "country" => "Canada", 
+                       "notes" => "Different notes", 
+                       "register_id" => "45"}
+        id_3 = write_table.add(data_hash_3)        
+        
+      ensure
+        write_table.close unless write_table.nil?
+      end      
+      
+      begin
+        read_table = TokyoWrapper::Table.create_with_read_non_locking(@table_file)
+      
+        read_table.find(id_1).should == {"street" => "1111 Main", 
+                                         "city" => "Montreal", 
+                                         "notes" => "Some notes", 
+                                         "register_id" => "45"}
+        read_table.find(id_2).should == {"city" => "Montreal", 
+                                         "province" => "Quebec", 
+                                         "notes" => "Another notes", 
+                                         "register_id" => "45"}
+        read_table.find(id_3).should == {"street" => "1111 Main", 
+                                         "city" => "Montreal", 
+                                         "country" => "Canada", 
+                                         "notes" => "Different notes", 
+                                         "register_id" => "45"}
+
+        read_table.keys_for_belongs_to_association_id("register_id", "45").should == ["city", "country", "notes", "province", "street"]        
+      ensure
+        read_table.close unless read_table.nil?
+      end            
       
     end
     

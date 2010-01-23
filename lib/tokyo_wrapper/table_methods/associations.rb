@@ -16,7 +16,30 @@ module TokyoWrapper
         else
           false
         end      
-      end      
+      end  
+      
+      def set_belongs_to_association_id(id, association_id_name, association_id)
+        if !@table[id.to_s].nil? && !@table[id.to_s].empty?
+          @table[id.to_s] = @table[id.to_s].merge({association_id_name => association_id.to_s})
+          true
+        else
+          false
+        end
+      end   
+      
+      def keys_for_belongs_to_association_id(association_id_name, association_id)
+        table_result_set = @table.query do |query|
+          query.add association_id_name, :equals, association_id.to_s
+          query.no_pk
+        end
+        keys = []
+        table_result_set.each do |row|
+          keys += row.keys
+          keys.uniq!
+        end
+        keys.delete(association_id_name)
+        keys.sort
+      end
       
     end
   
