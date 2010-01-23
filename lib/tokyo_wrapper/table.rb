@@ -1,6 +1,9 @@
+require 'tokyo_wrapper/table_methods/associations'
+
 module TokyoWrapper
 
   class Table
+    include TokyoWrapper::TableMethods::Associations
     
     def initialize(table)
       @table = table
@@ -39,18 +42,6 @@ module TokyoWrapper
         false
       end
     end    
-
-    def add_association_id(id, association_id_name, association_id) 
-      if !@table[id.to_s].nil? && !@table[id.to_s].empty?
-        association_ids_string = @table[id.to_s]["#{association_id_name}s"]
-        unless association_ids_string.split(",").include?(association_id.to_s)
-          @table[id.to_s] = @table[id.to_s].merge({"#{association_id_name}s" => "#{association_ids_string},#{association_id}"})
-        end
-        true
-      else
-        false
-      end      
-    end
   
     def all
       @table.query

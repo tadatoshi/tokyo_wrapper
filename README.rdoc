@@ -4,9 +4,11 @@
 
   It is extracted from the code I frequently use when using rufus-tokyo to access Tokyo Cabinet. 
 
-  For example, for table, I always add a row with unique id so I always use generate_unique_id method. By wrapping the call to this method, the code that is using the rufus/tokyo doesn't get cluttered. 
+  For example, for table, I always add a row with unique id so I always use generate_unique_id method. 
+  By wrapping the call to this method, the code that is using the rufus/tokyo doesn't get cluttered. 
 
-  rufus-tokyo is "ffi based ruby library to access Tokyo Cabinet and Tokyo Tyrant" by John Mettraux (Copyright (c) 2009-2010, see http://github.com/jmettraux/rufus-tokyo/blob/master/LICENSE.txt).
+  rufus-tokyo is "ffi based ruby library to access Tokyo Cabinet and Tokyo Tyrant" by John Mettraux 
+  (Copyright (c) 2009-2010, see http://github.com/jmettraux/rufus-tokyo/blob/master/LICENSE.txt).
 
 == Required Ruby Gems
 
