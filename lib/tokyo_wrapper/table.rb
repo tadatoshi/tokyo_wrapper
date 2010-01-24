@@ -55,6 +55,12 @@ module TokyoWrapper
       @table[id.to_s]
     end
     
+    def all_by_key_value(key, value)
+      @table.query do |query|
+        query.add key, :equals, value
+      end
+    end
+
     private
       # 
       # rufus-tokyo converts array to string without a delimiter e.g. It converts [1,2,3,4] to "1234". 

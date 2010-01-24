@@ -263,7 +263,7 @@ describe TokyoWrapper::TableMethods::Associations do
                        "notes" => "Some notes", 
                        "sector_ids" => ["2","5","32","8"]}
         id_1 = write_table.add(data_hash_1)
-        data_hash_2 = {"street" => "1111 Masonneuve", 
+        data_hash_2 = {"street" => "1111 Maisonneuve", 
                        "city" => "Montreal", 
                        "notes" => "Another notes", 
                        "sector_ids" => ["1","2","3458","9"]}
@@ -280,19 +280,23 @@ describe TokyoWrapper::TableMethods::Associations do
       begin
         read_table = TokyoWrapper::Table.create_with_read_non_locking(@table_file)
 
-        read_table.all_by_has_many_association_id("sector_id", "2").should == [{"street" => "1111 Main", 
+        read_table.all_by_has_many_association_id("sector_id", "2").should == [{:pk => id_1.to_s, 
+                                                                                "street" => "1111 Main", 
                                                                                 "city" => "Montreal", 
                                                                                 "notes" => "Some notes", 
                                                                                 "sector_ids" => "2,5,32,8"}, 
-                                                                               {"street" => "1111 Masonneuve", 
+                                                                               {:pk => id_2.to_s, 
+                                                                                "street" => "1111 Maisonneuve", 
                                                                                 "city" => "Montreal", 
                                                                                 "notes" => "Another notes", 
                                                                                 "sector_ids" => "1,2,3458,9"}]
-        read_table.all_by_has_many_association_id("sector_id", "45").should == [{"street" => "1111 Desjardins", 
+        read_table.all_by_has_many_association_id("sector_id", "45").should == [{:pk => id_3.to_s, 
+                                                                                 "street" => "1111 Desjardins", 
                                                                                  "city" => "Quebec", 
                                                                                  "notes" => "Different notes", 
                                                                                  "sector_ids" => "87,45,1,727"}]
-        read_table.all_by_has_many_association_id("sector_id", "3458").should == [{"street" => "1111 Masonneuve", 
+        read_table.all_by_has_many_association_id("sector_id", "3458").should == [{:pk => id_2.to_s, 
+                                                                                   "street" => "1111 Maisonneuve", 
                                                                                    "city" => "Montreal", 
                                                                                    "notes" => "Another notes", 
                                                                                    "sector_ids" => "1,2,3458,9"}]                                                                                

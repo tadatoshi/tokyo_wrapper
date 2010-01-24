@@ -21,7 +21,6 @@ module TokyoWrapper
       def all_by_has_many_association_id(association_id_name, association_id)
         @table.query do | query | 
           query.add "#{association_id_name}s", :stror, association_id.to_s
-          query.no_pk
         end
       end
       
