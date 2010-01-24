@@ -94,4 +94,49 @@ describe TokyoWrapper::Table do
     
   end
   
+  context "Delete" do
+    
+    it "should delete a row" do
+      
+      begin
+        write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock(@table_file) 
+      
+        data_hash = {"street" => "1111 Main", 
+                     "city" => "Montreal", 
+                     "notes" => "Some notes"}
+        id = write_table.add(data_hash)
+      ensure
+        write_table.close unless write_table.nil?
+      end
+      
+      begin
+        read_table = TokyoWrapper::Table.create_with_read_non_locking(@table_file)      
+                                      
+        read_table.find(id).should == {"street" => "1111 Main", 
+                                       "city" => "Montreal", 
+                                       "notes" => "Some notes"}   
+      ensure
+        read_table.close unless read_table.nil?
+      end
+      
+      begin
+        write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock(@table_file) 
+                                                         
+        write_table.delete(id)
+      ensure
+        write_table.close unless write_table.nil?
+      end
+
+      begin
+        read_table = TokyoWrapper::Table.create_with_read_non_locking(@table_file)  
+      
+        read_table.find(id).should be_nil
+      ensure
+        read_table.close unless read_table.nil?
+      end         
+      
+    end
+    
+  end
+  
 end

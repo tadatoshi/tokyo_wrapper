@@ -41,7 +41,11 @@ module TokyoWrapper
       else
         false
       end
-    end    
+    end   
+    
+    def delete(id)
+      @table.delete(id.to_s)
+    end     
   
     def all
       @table.query
