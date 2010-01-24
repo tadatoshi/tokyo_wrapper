@@ -18,6 +18,13 @@ module TokyoWrapper
         end      
       end  
       
+      def all_by_has_many_association_id(association_id_name, association_id)
+        @table.query do | query | 
+          query.add "#{association_id_name}s", :stror, association_id.to_s
+          query.no_pk
+        end
+      end
+      
       def set_belongs_to_association_id(id, association_id_name, association_id)
         if !@table[id.to_s].nil? && !@table[id.to_s].empty?
           @table[id.to_s] = @table[id.to_s].merge({association_id_name => association_id.to_s})
