@@ -12,7 +12,7 @@
 
 == Basic underlying philosophy
 
-  1. Preserve the functionality of rufus-tokyo. 
+  1. Preserve the functionality and behaviour of rufus-tokyo. 
 
     1-1. No fork of rufus-tokyo. 
 

@@ -192,4 +192,75 @@ describe TokyoWrapper::Table do
     
   end
   
+  context "store file content" do
+    
+    it "should store the content of the specified text file" do
+      
+      begin
+        write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock(@table_file)
+      
+        temp_file_content = open(File.expand_path(File.dirname(__FILE__) + '/../fixtures/temp.txt')).read
+
+        data_hash = {"filename" => "temp.txt", 
+                     "content_type" => "text/plain", 
+                     "size" => File.size(File.expand_path(File.dirname(__FILE__) + '/../fixtures/temp.txt')),
+                     "file_data" => temp_file_content}
+        id = write_table.add(data_hash)   
+
+      ensure
+        write_table.close unless write_table.nil?
+      end            
+      
+      begin
+        read_table = TokyoWrapper::Table.create_with_read_non_locking(@table_file)
+
+        read_table.find(id)["filename"].should == "temp.txt"   
+        read_table.find(id)["content_type"].should == "text/plain"   
+        read_table.find(id)["size"].should == "79"                           
+        read_table.find(id)["file_data"].should == "This is for testing storing the content of the file. \nDon't modify the content."
+      ensure
+        read_table.close unless read_table.nil?
+      end   
+      
+    end
+      
+    it "should store the content of the specified image file" do      
+      
+      begin
+        write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock(@table_file)
+      
+        image_file_content = open(File.expand_path(File.dirname(__FILE__) + '/../fixtures/rails.png')).read
+
+        data_hash = {"filename" => "rails.png", 
+                     "content_type" => "image/png", 
+                     "size" => File.size(File.expand_path(File.dirname(__FILE__) + '/../fixtures/rails.png')),
+                     "file_data" => image_file_content}
+        id = write_table.add(data_hash)   
+
+      ensure
+        write_table.close unless write_table.nil?
+      end            
+      
+      begin
+        read_table = TokyoWrapper::Table.create_with_read_non_locking(@table_file)
+        
+        read_table.find(id)["filename"].should == "rails.png"   
+        read_table.find(id)["content_type"].should == "image/png"   
+        read_table.find(id)["size"].should == "1787"
+                                     
+        file_for_retrieved_content = File.new(File.expand_path(File.dirname(__FILE__) + '/../fixtures/retrieved_rails.png'), "w")
+        file_for_retrieved_content.write(read_table.find(id)["file_data"])
+        file_for_retrieved_content.close
+        File.exists?(File.expand_path(File.dirname(__FILE__) + '/../fixtures/retrieved_rails.png')).should be_true
+        File.size(File.expand_path(File.dirname(__FILE__) + '/../fixtures/retrieved_rails.png')).should == File.size(File.expand_path(File.dirname(__FILE__) + '/../fixtures/rails.png'))
+
+      ensure
+        File.delete(File.expand_path(File.dirname(__FILE__) + '/../fixtures/retrieved_rails.png')) if File.exists?(File.expand_path(File.dirname(__FILE__) + '/../fixtures/retrieved_rails.png'))
+        read_table.close unless read_table.nil?
+      end                   
+      
+    end
+    
+  end
+  
 end
