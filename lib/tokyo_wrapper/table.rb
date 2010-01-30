@@ -51,10 +51,14 @@ module TokyoWrapper
       @table.query
     end  
   
-    def find(id)
-      @table[id.to_s]
+    def find(id, options = {})
+      if !options.empty? && options[:pk_included] == true
+        @table[id.to_s].merge({:pk => id.to_s})
+      else
+        @table[id.to_s]
+      end
     end
-    
+
     def all_by_key_value(key, value)
       @table.query do |query|
         query.add key, :equals, value
