@@ -1,9 +1,11 @@
 require 'tokyo_wrapper/table_methods/associations'
+require 'tokyo_wrapper/table_methods/query'
 
 module TokyoWrapper
 
   class Table
     include TokyoWrapper::TableMethods::Associations
+    include TokyoWrapper::TableMethods::Query
     
     def initialize(table)
       @table = table
