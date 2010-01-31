@@ -55,21 +55,21 @@ describe TokyoWrapper::TableMethods::Associations do
       begin
         read_table = TokyoWrapper::Table.create_with_read_non_locking(@table_file)      
                                       
-        read_table.all_by_key_values({"city" => "Montreal", 
-                                      "register_id" => "45"}).should == [{:pk => id_1.to_s, 
-                                                                          "street" => "1111 Main", 
-                                                                          "city" => "Montreal", 
-                                                                          "province" => "Quebec",
-                                                                          "country" => "Canada",
-                                                                          "notes" => "Some notes", 
-                                                                          "register_id" => "45"}, 
-                                                                         {:pk => id_4.to_s, 
-                                                                          "street" => "1112 Main", 
-                                                                          "city" => "Montreal", 
-                                                                          "province" => "Quebec",
-                                                                          "country" => "Canada", 
-                                                                          "notes" => "One more note", 
-                                                                          "register_id" => "45"}]
+        read_table.all_by_multiple_key_values({"city" => "Montreal", 
+                                               "register_id" => "45"}).should == [{:pk => id_1.to_s, 
+                                                                                   "street" => "1111 Main", 
+                                                                                   "city" => "Montreal", 
+                                                                                   "province" => "Quebec",
+                                                                                   "country" => "Canada",
+                                                                                   "notes" => "Some notes", 
+                                                                                   "register_id" => "45"}, 
+                                                                                  {:pk => id_4.to_s, 
+                                                                                   "street" => "1112 Main", 
+                                                                                   "city" => "Montreal", 
+                                                                                   "province" => "Quebec",
+                                                                                   "country" => "Canada", 
+                                                                                   "notes" => "One more note", 
+                                                                                   "register_id" => "45"}]
       ensure
         read_table.close unless read_table.nil?
       end      
