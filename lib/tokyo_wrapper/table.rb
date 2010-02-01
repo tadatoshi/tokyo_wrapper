@@ -1,9 +1,11 @@
+require 'tokyo_wrapper/helper_methods/array_converter'
 require 'tokyo_wrapper/table_methods/associations'
 require 'tokyo_wrapper/table_methods/query'
 
 module TokyoWrapper
 
   class Table
+    include TokyoWrapper::HelperMethods::ArrayConverter
     include TokyoWrapper::TableMethods::Associations
     include TokyoWrapper::TableMethods::Query
     
@@ -49,36 +51,26 @@ module TokyoWrapper
       @table.delete(id.to_s)
     end     
   
-    def all
-      @table.query
-    end  
-  
+    def all(options = {})
+      result = @table.query
+      convert_values_to_array_for_keys_for_multiple_key_value_hashes(result, options[:keys_for_has_many_association])
+    end
+
     def find(id, options = {})
       if !options.empty? && options[:pk_included] == true
-        @table[id.to_s].merge({:pk => id.to_s})
+        result = @table[id.to_s].merge({:pk => id.to_s})
       else
-        @table[id.to_s]
+        result = @table[id.to_s]
       end
+      convert_values_to_array_for_keys(result, options[:keys_for_has_many_association])
     end
 
-    def all_by_key_value(key, value)
-      @table.query do |query|
+    def all_by_key_value(key, value, options = {})
+      result = @table.query do |query|
         query.add key, :equals, value
       end
+      convert_values_to_array_for_keys_for_multiple_key_value_hashes(result, options[:keys_for_has_many_association])
     end
-
-    private
-      # 
-      # rufus-tokyo converts array to string without a delimiter e.g. It converts [1,2,3,4] to "1234". 
-      # So the array needs to be converted to the comma separated string before being added. e.g. "1,2,3,4"
-      #
-      def convert_params(params)
-        params.each do |key, value|
-          if value.instance_of?(Array)
-            params[key] = value.join(",")
-          end
-        end
-      end
     
   end
 

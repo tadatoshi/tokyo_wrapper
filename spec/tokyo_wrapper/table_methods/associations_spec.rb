@@ -14,22 +14,6 @@ describe TokyoWrapper::TableMethods::Associations do
   
   context "has_many associations" do 
     
-    it "should convert array parameter value to joined comma-separated string" do
-      
-      write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock(@table_file) 
-      
-      params_1 = { "name" => "Temp name", "sector_ids" => [2,5,34,8] }
-      
-      write_table.send(:convert_params, params_1).should == { "name" => "Temp name", "sector_ids" => "2,5,34,8" }
-      
-      params_2 = { "name" => "Temp name", "sector_ids" => ["2","5","34","8"] }
-      
-      write_table.send(:convert_params, params_2).should == { "name" => "Temp name", "sector_ids" => "2,5,34,8" }   
-      
-      write_table.close   
-      
-    end
-    
     it "should add data with has_many association" do
       
       begin
@@ -52,11 +36,22 @@ describe TokyoWrapper::TableMethods::Associations do
                                    "city" => "Montreal", 
                                    "notes" => "Some notes", 
                                    "sector_ids" => "2,5,34,8"}]
-                                      
+                                   
+        read_table.all(:keys_for_has_many_association => ["sector_ids"]).should == [{:pk => id.to_s,
+                                                                                     "street" => "1111 Main", 
+                                                                                     "city" => "Montreal", 
+                                                                                     "notes" => "Some notes", 
+                                                                                     "sector_ids" => ["2","5","34","8"]}]                                   
+
         read_table.find(id).should == {"street" => "1111 Main", 
                                        "city" => "Montreal", 
                                        "notes" => "Some notes", 
                                        "sector_ids" => "2,5,34,8"}
+                                       
+        read_table.find(id, :keys_for_has_many_association => ["sector_ids"]).should == {"street" => "1111 Main", 
+                                                                                         "city" => "Montreal", 
+                                                                                         "notes" => "Some notes", 
+                                                                                         "sector_ids" => ["2","5","34","8"]}                                       
       ensure                           
         read_table.close unless read_table.nil?
       end                           
@@ -290,16 +285,44 @@ describe TokyoWrapper::TableMethods::Associations do
                                                                                 "city" => "Montreal", 
                                                                                 "notes" => "Another notes", 
                                                                                 "sector_ids" => "1,2,3458,9"}]
+                                                                                
+        read_table.all_by_has_many_association_id("sector_id", "2", 
+                                                  :keys_for_has_many_association => ["sector_ids"]).should == [{:pk => id_1.to_s, 
+                                                                                                                "street" => "1111 Main", 
+                                                                                                                "city" => "Montreal", 
+                                                                                                                "notes" => "Some notes", 
+                                                                                                                "sector_ids" => ["2","5","32","8"]}, 
+                                                                                                               {:pk => id_2.to_s, 
+                                                                                                                "street" => "1111 Maisonneuve", 
+                                                                                                                "city" => "Montreal", 
+                                                                                                                "notes" => "Another notes", 
+                                                                                                                "sector_ids" => ["1","2","3458","9"]}]                                                                                
+                                                                                
         read_table.all_by_has_many_association_id("sector_id", "45").should == [{:pk => id_3.to_s, 
                                                                                  "street" => "1111 Desjardins", 
                                                                                  "city" => "Quebec", 
                                                                                  "notes" => "Different notes", 
                                                                                  "sector_ids" => "87,45,1,727"}]
+                                                                                 
+        read_table.all_by_has_many_association_id("sector_id", "45", 
+                                                  :keys_for_has_many_association => ["sector_ids"]).should == [{:pk => id_3.to_s, 
+                                                                                                                "street" => "1111 Desjardins", 
+                                                                                                                "city" => "Quebec", 
+                                                                                                                "notes" => "Different notes", 
+                                                                                                                "sector_ids" => ["87","45","1","727"]}]                                                                                 
+                                                                                 
         read_table.all_by_has_many_association_id("sector_id", "3458").should == [{:pk => id_2.to_s, 
                                                                                    "street" => "1111 Maisonneuve", 
                                                                                    "city" => "Montreal", 
                                                                                    "notes" => "Another notes", 
-                                                                                   "sector_ids" => "1,2,3458,9"}]                                                                                
+                                                                                   "sector_ids" => "1,2,3458,9"}] 
+                                                                                   
+        read_table.all_by_has_many_association_id("sector_id", "3458", 
+                                                  :keys_for_has_many_association => ["sector_ids"]).should == [{:pk => id_2.to_s, 
+                                                                                                                "street" => "1111 Maisonneuve", 
+                                                                                                                "city" => "Montreal", 
+                                                                                                                "notes" => "Another notes", 
+                                                                                                                "sector_ids" => ["1","2","3458","9"]}]                                                                                                                                                                   
       ensure
         read_table.close unless read_table.nil?
       end

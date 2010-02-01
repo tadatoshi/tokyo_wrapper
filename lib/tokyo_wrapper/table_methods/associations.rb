@@ -18,10 +18,11 @@ module TokyoWrapper
         end      
       end  
       
-      def all_by_has_many_association_id(association_id_name, association_id)
-        @table.query do | query | 
+      def all_by_has_many_association_id(association_id_name, association_id, options = {})
+        result = @table.query do | query | 
           query.add "#{association_id_name}s", :stror, association_id.to_s
         end
+        convert_values_to_array_for_keys_for_multiple_key_value_hashes(result, options[:keys_for_has_many_association])
       end
       
       def set_belongs_to_association_id(id, association_id_name, association_id)

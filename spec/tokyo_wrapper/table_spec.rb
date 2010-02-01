@@ -171,9 +171,99 @@ describe TokyoWrapper::Table do
       
     end
     
+    it "should find a row with a given id with has_many association ids converted to array" do
+      
+      begin
+        write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock(@table_file)
+
+        data_hash = {"street" => "1111 Main", 
+                     "city" => "Montreal", 
+                     "notes" => "Some notes", 
+                     "sector_ids" => "2,5,34,8"}
+        id = write_table.add(data_hash)
+      ensure
+        write_table.close unless write_table.nil?
+      end
+
+      begin
+        read_table = TokyoWrapper::Table.create_with_read_non_locking(@table_file)
+                                      
+        read_table.find(id, :pk_included => true, :keys_for_has_many_association => ["sector_ids"]).should == {:pk => id.to_s, 
+                                                                                                               "street" => "1111 Main", 
+                                                                                                               "city" => "Montreal", 
+                                                                                                               "notes" => "Some notes", 
+                                                                                                               "sector_ids" => ["2","5","34","8"]}                                        
+                                       
+      ensure      
+        read_table.close unless read_table.nil?
+      end                       
+      
+    end
+    
   end
   
   context "Find all" do
+    
+    it "should find all the rows with has_many association ids converted to array" do
+      
+      begin
+        write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock(@table_file)
+      
+        data_hash_1 = {"street" => "1111 Main", 
+                       "city" => "Montreal", 
+                       "province" => "Quebec",
+                       "country" => "Canada",
+                       "notes" => "Some notes", 
+                       "sector_ids" => "2,5,34,8"}
+        id_1 = write_table.add(data_hash_1)
+        data_hash_2 = {"street" => "1111 Maisonneuve",
+                       "city" => "Montreal", 
+                       "province" => "Quebec", 
+                       "country" => "Canada",
+                       "notes" => "Another notes",
+                       "sector_ids" => "3,5,6,8"}
+        id_2 = write_table.add(data_hash_2)
+        data_hash_3 = {"street" => "1111 Main", 
+                       "city" => "Quebec", 
+                       "province" => "Quebec",
+                       "country" => "Canada", 
+                       "notes" => "Different notes",
+                       "sector_ids" => "2,1,34,7"}
+        id_3 = write_table.add(data_hash_3)        
+        
+      ensure
+        write_table.close unless write_table.nil?
+      end      
+
+      begin
+        read_table = TokyoWrapper::Table.create_with_read_non_locking(@table_file)      
+                                      
+        read_table.all(:keys_for_has_many_association => ["sector_ids"]).should == [{:pk => id_1.to_s, 
+                                                                                     "street" => "1111 Main", 
+                                                                                     "city" => "Montreal", 
+                                                                                     "province" => "Quebec",
+                                                                                     "country" => "Canada",
+                                                                                     "notes" => "Some notes", 
+                                                                                     "sector_ids" => ["2","5","34","8"]}, 
+                                                                                    {:pk => id_2.to_s, 
+                                                                                     "street" => "1111 Maisonneuve",
+                                                                                     "city" => "Montreal", 
+                                                                                     "province" => "Quebec", 
+                                                                                     "country" => "Canada",
+                                                                                     "notes" => "Another notes", 
+                                                                                     "sector_ids" => ["3","5","6","8"]}, 
+                                                                                    {:pk => id_3.to_s, 
+                                                                                     "street" => "1111 Main", 
+                                                                                     "city" => "Quebec", 
+                                                                                     "province" => "Quebec",
+                                                                                     "country" => "Canada", 
+                                                                                     "notes" => "Different notes",
+                                                                                     "sector_ids" => ["2","1","34","7"]}]
+      ensure
+        read_table.close unless read_table.nil?
+      end            
+      
+    end
     
     it "should find all the rows that have a given value" do
       
@@ -223,6 +313,61 @@ describe TokyoWrapper::Table do
       end      
       
     end
+    
+    it "should find all the rows that have a given value with has_many association ids converted to array" do
+      
+      begin
+        write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock(@table_file)
+      
+        data_hash_1 = {"street" => "1111 Main", 
+                       "city" => "Montreal", 
+                       "province" => "Quebec",
+                       "country" => "Canada",
+                       "notes" => "Some notes", 
+                       "sector_ids" => "2,5,34,8"}
+        id_1 = write_table.add(data_hash_1)
+        data_hash_2 = {"street" => "1111 Maisonneuve",
+                       "city" => "Montreal", 
+                       "province" => "Quebec", 
+                       "country" => "Canada",
+                       "notes" => "Another notes",
+                       "sector_ids" => "3,5,6,8"}
+        id_2 = write_table.add(data_hash_2)
+        data_hash_3 = {"street" => "1111 Main", 
+                       "city" => "Quebec", 
+                       "province" => "Quebec",
+                       "country" => "Canada", 
+                       "notes" => "Different notes",
+                       "sector_ids" => "2,1,34,7"}
+        id_3 = write_table.add(data_hash_3)        
+        
+      ensure
+        write_table.close unless write_table.nil?
+      end      
+
+      begin
+        read_table = TokyoWrapper::Table.create_with_read_non_locking(@table_file)      
+                                      
+        read_table.all_by_key_value("city", "Montreal", 
+                                    :keys_for_has_many_association => ["sector_ids"]).should == [{:pk => id_1.to_s, 
+                                                                                                  "street" => "1111 Main", 
+                                                                                                  "city" => "Montreal", 
+                                                                                                  "province" => "Quebec",
+                                                                                                  "country" => "Canada",
+                                                                                                  "notes" => "Some notes", 
+                                                                                                  "sector_ids" => ["2","5","34","8"]}, 
+                                                                                                 {:pk => id_2.to_s, 
+                                                                                                  "street" => "1111 Maisonneuve",
+                                                                                                  "city" => "Montreal", 
+                                                                                                  "province" => "Quebec", 
+                                                                                                  "country" => "Canada",
+                                                                                                  "notes" => "Another notes", 
+                                                                                                  "sector_ids" => ["3","5","6","8"]}]
+      ensure
+        read_table.close unless read_table.nil?
+      end      
+      
+    end    
     
   end
   

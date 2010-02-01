@@ -24,28 +24,32 @@ describe TokyoWrapper::TableMethods::Associations do
                        "province" => "Quebec",
                        "country" => "Canada",
                        "notes" => "Some notes", 
-                       "register_id" => "45"}
+                       "register_id" => "45", 
+                       "sector_ids" => ["2","5","32","8"]}
         id_1 = write_table.add(data_hash_1)
         data_hash_2 = {"street" => "1111 Maisonneuve",
                        "city" => "Montreal", 
                        "province" => "Quebec", 
                        "country" => "Canada",
                        "notes" => "Another notes", 
-                       "register_id" => "8"}
+                       "register_id" => "8", 
+                       "sector_ids" => ["1","2","3458","9"]}
         id_2 = write_table.add(data_hash_2)
         data_hash_3 = {"street" => "1111 Main", 
                        "city" => "Quebec", 
                        "province" => "Quebec",
                        "country" => "Canada", 
                        "notes" => "Different notes", 
-                       "register_id" => "8"}
+                       "register_id" => "8", 
+                       "sector_ids" => ["87","45","1","727"]}
         id_3 = write_table.add(data_hash_3)  
         data_hash_4 = {"street" => "1112 Main", 
                        "city" => "Montreal", 
                        "province" => "Quebec",
                        "country" => "Canada", 
                        "notes" => "One more note", 
-                       "register_id" => "45"}
+                       "register_id" => "45", 
+                       "sector_ids" => ["87","45","1","727"]}
         id_4 = write_table.add(data_hash_4)            
         
       ensure
@@ -62,14 +66,35 @@ describe TokyoWrapper::TableMethods::Associations do
                                                                                    "province" => "Quebec",
                                                                                    "country" => "Canada",
                                                                                    "notes" => "Some notes", 
-                                                                                   "register_id" => "45"}, 
+                                                                                   "register_id" => "45", 
+                                                                                   "sector_ids" => "2,5,32,8"}, 
                                                                                   {:pk => id_4.to_s, 
                                                                                    "street" => "1112 Main", 
                                                                                    "city" => "Montreal", 
                                                                                    "province" => "Quebec",
                                                                                    "country" => "Canada", 
                                                                                    "notes" => "One more note", 
-                                                                                   "register_id" => "45"}]
+                                                                                   "register_id" => "45", 
+                                                                                   "sector_ids" => "87,45,1,727"}]
+                                                                                   
+        read_table.all_by_multiple_key_values({"city" => "Montreal", 
+                                               "register_id" => "45"}, 
+                                              {:keys_for_has_many_association => ["sector_ids"]}).should == [{:pk => id_1.to_s, 
+                                                                                                              "street" => "1111 Main", 
+                                                                                                              "city" => "Montreal", 
+                                                                                                              "province" => "Quebec",
+                                                                                                              "country" => "Canada",
+                                                                                                              "notes" => "Some notes", 
+                                                                                                              "register_id" => "45", 
+                                                                                                              "sector_ids" => ["2","5","32","8"]}, 
+                                                                                                             {:pk => id_4.to_s, 
+                                                                                                              "street" => "1112 Main", 
+                                                                                                              "city" => "Montreal", 
+                                                                                                              "province" => "Quebec",
+                                                                                                              "country" => "Canada", 
+                                                                                                              "notes" => "One more note", 
+                                                                                                              "register_id" => "45", 
+                                                                                                              "sector_ids" => ["87","45","1","727"]}]                                                                                   
       ensure
         read_table.close unless read_table.nil?
       end      
