@@ -36,8 +36,8 @@ describe TokyoWrapper::HelperMethods::ArrayConverter do
     
     it "should convert string with comma separated elements to array" do
       
-      @array_converter_includer.convert_comman_separated_values_string_to_array("2,5,32,8").should == ["2","5","32","8"]
-      @array_converter_includer.convert_comman_separated_values_string_to_array("2,5,,8").should == ["2","5","","8"]
+      @array_converter_includer.convert_comma_separated_values_string_to_array("2,5,32,8").should == ["2","5","32","8"]
+      @array_converter_includer.convert_comma_separated_values_string_to_array("2,5,,8").should == ["2","5","","8"]
       
     end
     

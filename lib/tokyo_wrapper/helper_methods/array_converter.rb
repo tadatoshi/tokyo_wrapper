@@ -17,7 +17,7 @@ module TokyoWrapper
         params
       end
       
-      def convert_comman_separated_values_string_to_array(comman_separated_values_string)
+      def convert_comma_separated_values_string_to_array(comman_separated_values_string)
         comman_separated_values_string.split(',').compact
       end
       
@@ -25,7 +25,7 @@ module TokyoWrapper
         if !keys.nil? && !keys.empty?
           keys.each do |key|
             if key_value_hash.has_key?(key)
-              key_value_hash[key] = convert_comman_separated_values_string_to_array(key_value_hash[key])
+              key_value_hash[key] = convert_comma_separated_values_string_to_array(key_value_hash[key])
             end
           end
         end
