@@ -22,7 +22,7 @@ module TokyoWrapper
         result = @table.query do | query | 
           query.add "#{association_id_name}s", :stror, association_id.to_s
         end
-        convert_values_to_array_for_keys_for_multiple_key_value_hashes(result, options[:keys_for_has_many_association])
+        convert_values_to_array_for_keys_for_multiple_key_value_hashes(result, ["#{association_id_name}s"])
       end
       
       def set_belongs_to_association_id(id, association_id_name, association_id)

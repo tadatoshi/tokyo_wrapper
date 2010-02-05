@@ -279,50 +279,25 @@ describe TokyoWrapper::TableMethods::Associations do
                                                                                 "street" => "1111 Main", 
                                                                                 "city" => "Montreal", 
                                                                                 "notes" => "Some notes", 
-                                                                                "sector_ids" => "2,5,32,8"}, 
+                                                                                "sector_ids" => ["2","5","32","8"]}, 
                                                                                {:pk => id_2.to_s, 
                                                                                 "street" => "1111 Maisonneuve", 
                                                                                 "city" => "Montreal", 
                                                                                 "notes" => "Another notes", 
-                                                                                "sector_ids" => "1,2,3458,9"}]
-                                                                                
-        read_table.all_by_has_many_association_id("sector_id", "2", 
-                                                  :keys_for_has_many_association => ["sector_ids"]).should == [{:pk => id_1.to_s, 
-                                                                                                                "street" => "1111 Main", 
-                                                                                                                "city" => "Montreal", 
-                                                                                                                "notes" => "Some notes", 
-                                                                                                                "sector_ids" => ["2","5","32","8"]}, 
-                                                                                                               {:pk => id_2.to_s, 
-                                                                                                                "street" => "1111 Maisonneuve", 
-                                                                                                                "city" => "Montreal", 
-                                                                                                                "notes" => "Another notes", 
-                                                                                                                "sector_ids" => ["1","2","3458","9"]}]                                                                                
+                                                                                "sector_ids" => ["1","2","3458","9"]}]
                                                                                 
         read_table.all_by_has_many_association_id("sector_id", "45").should == [{:pk => id_3.to_s, 
                                                                                  "street" => "1111 Desjardins", 
                                                                                  "city" => "Quebec", 
                                                                                  "notes" => "Different notes", 
-                                                                                 "sector_ids" => "87,45,1,727"}]
-                                                                                 
-        read_table.all_by_has_many_association_id("sector_id", "45", 
-                                                  :keys_for_has_many_association => ["sector_ids"]).should == [{:pk => id_3.to_s, 
-                                                                                                                "street" => "1111 Desjardins", 
-                                                                                                                "city" => "Quebec", 
-                                                                                                                "notes" => "Different notes", 
-                                                                                                                "sector_ids" => ["87","45","1","727"]}]                                                                                 
-                                                                                 
+                                                                                 "sector_ids" => ["87","45","1","727"]}]
+                                                                                                                                                                  
         read_table.all_by_has_many_association_id("sector_id", "3458").should == [{:pk => id_2.to_s, 
                                                                                    "street" => "1111 Maisonneuve", 
                                                                                    "city" => "Montreal", 
                                                                                    "notes" => "Another notes", 
-                                                                                   "sector_ids" => "1,2,3458,9"}] 
+                                                                                   "sector_ids" => ["1","2","3458","9"]}] 
                                                                                    
-        read_table.all_by_has_many_association_id("sector_id", "3458", 
-                                                  :keys_for_has_many_association => ["sector_ids"]).should == [{:pk => id_2.to_s, 
-                                                                                                                "street" => "1111 Maisonneuve", 
-                                                                                                                "city" => "Montreal", 
-                                                                                                                "notes" => "Another notes", 
-                                                                                                                "sector_ids" => ["1","2","3458","9"]}]                                                                                                                                                                   
       ensure
         read_table.close unless read_table.nil?
       end

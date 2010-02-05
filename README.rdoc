@@ -332,31 +332,14 @@
              Call all_by_has_many_association_id method on table object with read mode 
            (instantiated by create_with_read_non_locking).
              It expects association id name and association id. 
-             If :keys_for_has_many_association is specified as the last argument (options), 
-           the value for the specified has_many association keys are converted to array 
-           in the returned hash. (This option is universal for all the query methods.)
              It returns an array of hashes. 
 
-           e.g.1. 
+           e.g.
 
              begin
                read_table = TokyoWrapper::Table.create_with_read_non_locking("table.txt")
 
                records = read_table.all_by_has_many_association_id("sector_id", "2")
-             ensure      
-               read_table.close unless read_table.nil?
-             end              
-
-             -> records: [{:pk => 1, "street" => "1111 Main", "sector_ids" => "2,5,32,8"}, 
-                          {:pk => 2, "street" => "1122 Main", "sector_ids" => "1,2,3458,9"}]
-
-           e.g.2. has_many association ids value is converted to array.
-
-             begin
-               read_table = TokyoWrapper::Table.create_with_read_non_locking("table.txt")
-
-               records = read_table.all_by_has_many_association_id("sector_id", "2", 
-                                                                   :keys_for_has_many_association => ["sector_ids"])
              ensure
                read_table.close unless read_table.nil?
              end              
@@ -396,10 +379,16 @@
 
       2-5-6. :keys_for_has_many_association option for query methods.
 
-             All the query methods accepts :keys_for_has_many_association option as in 
-           all_by_has_many_association_id in 2-5-4. above. 
-             i.e. all, find, all_by_key_value, all_by_multiple_key_values, and 
-           all_by_has_many_association_id methods
+             All the query methods accepts :keys_for_has_many_association option as the last argument 
+           (options). When it is set, the value for the specified has_many association keys are converted 
+           to array in the returned hash. 
+             The query methods: all, find, all_by_key_value, and all_by_multiple_key_values
+
+             This is because has_many association id is stored as a string with ids separated by comma. 
+           And simply returning the records from rufus/tokyo keeps that format. 
+             Note: When an array is passed as a value to rufus/tokyo, it concatenates the elements of 
+           the array without any delimiter and stores the resulting string value. Hence, this gem 
+           converts an array to a string with comma separated elements. 
 
           e.g.
 
