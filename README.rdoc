@@ -43,6 +43,378 @@
 
   sudo gem install tokyo_wrapper --source http://gemcutter.org
 
+== Usage
+
+  1. Requiring 'tokyo_wrapper' in Ruby code. 
+
+     require 'tokyo_wrapper'
+
+  2. Tokyo Cabinet table. 
+
+    2-1. Getting table object. 
+
+         Tokyo Cabinet table stores data in a file with extension .tct e.g. table.tct
+
+         TokyoWrapper::Table class has three factory methods to create an instance of itself:
+ 
+         create_with_create_write_non_blocking_lock(file) 
+             Use when table file doesn't exist. This creates the table file with the given name and 
+           opens it for writing data. 
+             It locks the table. 
+             Only non_locking table (instantiated by create_with_read_non_locking) 
+           in a different thread can access the table when the instance from this method is in use 
+           (i.e. when it's not closed yet). 
+
+         create_with_write_non_blocking_lock(file)
+             Use when table file already exists and you want to write data in it. 
+             It locks the table. 
+             Only non_locking table (instantiated by create_with_read_non_locking) 
+           in a different thread can access the table when the instance from this method is in use
+           (i.e. when it's not closed yet). 
+
+         create_with_read_non_locking(file)
+             Use when table file already exists and you want to read data from it. 
+             It doesn't lock the table. 
+
+    2-2. Table object must be closed when all the operations are done by calling close method. 
+
+         e.g. 
+
+           begin
+             write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock("table.txt")
+  
+           ensure
+             write_table.close unless write_table.nil?
+           end
+
+    2-3. Basic operations. (Defined in TokyoWrapper::Table class itself.)
+
+      2-3-1. Adding data. 
+
+             Call add method on table object with write mode 
+           (instantiated by create_with_create_write_non_blocking_lock or 
+           create_with_write_non_blocking_lock). 
+             It expects a hash, which corresponds to one record (row) in a table. 
+             It returns the id (pk in rufus/tokyo term) with type integer. 
+
+           e.g. 
+
+             begin
+               write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock("table.txt")
+
+               data_hash = {"street" => "1111 Main", 
+                            "city" => "Montreal", 
+                            "notes" => "Some notes"}
+               id = write_table.add(data_hash)
+             ensure
+               write_table.close unless write_table.nil?
+             end        
+  
+      2-3-2. Updating data. 
+
+             Call update method on table object with write mode 
+           (instantiated by create_with_create_write_non_blocking_lock or 
+           create_with_write_non_blocking_lock).
+             It expects the id of the table record and a hash of updating data.
+
+           e.g. 
+
+             begin
+               write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock("table.txt")
+
+               id = "3"
+               update_data_hash = {"street" => "1112 Main", 
+                                   "notes" => "Recently situation has been changed."}
+               write_table.update(id, update_data_hash)
+             ensure
+               write_table.close unless write_table.nil?
+             end                    
+
+      2-3-3. Deleting data. 
+
+             Call delete method on table object with write mode 
+           (instantiated by create_with_create_write_non_blocking_lock or 
+           create_with_write_non_blocking_lock).
+             It expects the id of the table record.
+
+           e.g. 
+
+             begin
+               write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock("table.txt")
+
+               id = "3"
+               write_table.delete(id)
+             ensure
+               write_table.close unless write_table.nil?
+             end                    
+
+      2-3-4. Getting all the records (rows). 
+
+             Call all method on table object with read mode (instantiated by create_with_read_non_locking).
+             It returns an array of hashes. (The same object returned by rufus/tokyo.)
+
+           e.g. 
+
+             begin
+               read_table = TokyoWrapper::Table.create_with_read_non_locking("table.txt")
+
+               records = read_table.all
+             ensure      
+               read_table.close unless read_table.nil?
+             end              
+
+             -> records: [{:pk => 1, "street" => "1111 Main", "city" => "Montreal", "notes" => "Some notes"}, 
+                          {:pk => 2, "street" => "2222 Main", "city" => "Quebec", "notes" => "Different notes"}]    
+
+      2-3-5. Finding a record (rows). 
+
+             Call find method on table object with read mode (instantiated by create_with_read_non_locking).
+             It expects the id of the table record. 
+             If :pk_included => true is specified as the last argument (options), 
+           returned hash contains :pk (id). 
+           (Note: This method is the only one that requires this option. 
+           All the other query methods includes :pk by default just like rufus/tokyo.)
+             It returns a hash. 
+
+           e.g.1.
+
+             begin
+               read_table = TokyoWrapper::Table.create_with_read_non_locking("table.txt")
+
+               id = "3"
+               record = read_table.find(id)
+             ensure      
+               read_table.close unless read_table.nil?
+             end    
+
+             -> record: {"street" => "1111 Main", "city" => "Montreal", "notes" => "Some notes"} 
+
+           e.g.2.
+
+             begin
+               read_table = TokyoWrapper::Table.create_with_read_non_locking("table.txt")
+
+               id = "3"
+               record = read_table.find(id, :pk_included => true)
+             ensure      
+               read_table.close unless read_table.nil?
+             end    
+
+             -> record: {:pk => 1, "street" => "1111 Main", "city" => "Montreal", "notes" => "Some notes"}
+
+    2-4. Query operations. 
+         (Defined in TokyoWrapper::TableMethods::Query module and included in TokyoWrapper::Table class.)
+
+      2-4-1. Getting all the records (rows) with the given key-value. 
+
+             Call all_by_key_value method on table object with read mode 
+           (instantiated by create_with_read_non_locking).
+             It expects key and value. 
+             It returns an array of hashes. (The same object returned by rufus/tokyo.)
+
+           e.g. 
+
+             begin
+               read_table = TokyoWrapper::Table.create_with_read_non_locking("table.txt")
+
+               records = read_table.all_by_key_value("city", "Montreal")
+             ensure      
+               read_table.close unless read_table.nil?
+             end              
+
+             -> records: [{:pk => 1, "street" => "1111 Main", "city" => "Montreal", "notes" => "Some notes"}]
+
+      2-4-2. Getting all the records (rows) with the given multiple key-values. 
+
+             Call all_by_multiple_key_values method on table object with read mode 
+          (instantiated by create_with_read_non_locking).
+             It expects a hash of key values.
+             It returns an array of hashes. (The same object returned by rufus/tokyo.)
+
+           e.g. 
+
+             begin
+               read_table = TokyoWrapper::Table.create_with_read_non_locking("table.txt")
+
+               records = read_table.all_by_multiple_key_values({"city" => "Montreal", 
+                                                                "register_id" => "45"})
+             ensure      
+               read_table.close unless read_table.nil?
+             end              
+
+             -> records: [{:pk => 1, "street" => "1111 Main", "city" => "Montreal", 
+                           "notes" => "Some notes", "register_id" => "45"}]
+
+    2-5. Associations. 
+         (Defined in TokyoWrapper::TableMethods::Associations module 
+         and included in TokyoWrapper::Table class.)
+
+         It is for achieving one-to-many and many-to-many associations. 
+
+      2-5-1. Adding data with has_many association ids. 
+             (A record of the table is associated with multiple records of another table.) 
+
+             Call add method on table object with write mode 
+           (instantiated by create_with_create_write_non_blocking_lock or 
+           create_with_write_non_blocking_lock). 
+             It expects a hash with has_many association ids to be array.  
+             It returns the id (pk in rufus/tokyo term) with type integer. 
+
+           e.g. 
+
+             begin
+               write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock("table.txt")
+
+               data_hash = {"street" => "1111 Main", 
+                            "city" => "Montreal", 
+                            "notes" => "Some notes", 
+                            "sector_ids" => ["2","5","34","8"]}
+               id = write_table.add(data_hash)
+             ensure
+               write_table.close unless write_table.nil?
+             end        
+
+      2-5-2. Updating data with has_many association ids. 
+             (A record of the table is associated with multiple records of another table.)
+
+             Call update method on table object with write mode 
+           (instantiated by create_with_create_write_non_blocking_lock or 
+           create_with_write_non_blocking_lock).
+             It expects the id of the table record and a hash of updating data
+           with has_many association ids to be array.
+
+           e.g. 
+
+             begin
+               write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock("table.txt")
+
+               id = "3"
+               update_data_hash = {"street" => "1112 Main", 
+                                   "sector_ids" => ["2","5","40","8","12"]}
+               write_table.update(id, update_data_hash)
+             ensure
+               write_table.close unless write_table.nil?
+             end                
+
+      2-5-3. Adding has_many association id. 
+             (A record of the table is associated with multiple records of another table.) 
+
+             Call add_has_many_association_id method on table object with write mode 
+           (instantiated by create_with_create_write_non_blocking_lock or 
+           create_with_write_non_blocking_lock). 
+             It expects the id of the table record, association id name and association id.  
+
+           e.g.1.
+
+             begin
+               write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock("table.txt")
+
+               id = "3"
+               write_table.add_has_many_association_id(id, "sector_id", 78)
+             ensure
+               write_table.close unless write_table.nil?
+             end        
+
+           e.g.2.
+
+             begin
+               write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock("table.txt")
+
+               id = "3"
+               write_table.add_has_many_association_id(id, "sector_id", "78")
+             ensure
+               write_table.close unless write_table.nil?
+             end        
+
+      2-5-4. Getting all the records (rows) with the given has_many association id.
+             (A record of the table is associated with multiple records of another table.)
+
+             Call all_by_has_many_association_id method on table object with read mode 
+           (instantiated by create_with_read_non_locking).
+             It expects association id name and association id. 
+             If :keys_for_has_many_association is specified as the last argument (options), 
+           the value for the specified has_many association keys are converted to array 
+           in the returned hash. (This option is universal for all the query methods.)
+             It returns an array of hashes. 
+
+           e.g.1. 
+
+             begin
+               read_table = TokyoWrapper::Table.create_with_read_non_locking("table.txt")
+
+               records = read_table.all_by_has_many_association_id("sector_id", "2")
+             ensure      
+               read_table.close unless read_table.nil?
+             end              
+
+             -> records: [{:pk => 1, "street" => "1111 Main", "sector_ids" => "2,5,32,8"}, 
+                          {:pk => 2, "street" => "1122 Main", "sector_ids" => "1,2,3458,9"}]
+
+           e.g.2. has_many association ids value is converted to array.
+
+             begin
+               read_table = TokyoWrapper::Table.create_with_read_non_locking("table.txt")
+
+               records = read_table.all_by_has_many_association_id("sector_id", "2", 
+                                                                   :keys_for_has_many_association => ["sector_ids"])
+             ensure
+               read_table.close unless read_table.nil?
+             end              
+
+             -> records: [{:pk => 1, "street" => "1111 Main", "sector_ids" => ["2","5","32","8"]}, 
+                          {:pk => 2, "street" => "1122 Main", "sector_ids" => ["1","2","3458","9"]}]
+
+      2-5-5. Setting a belongs_to association id. 
+             (Multiple records of the table is associated with a single record of another table.) 
+
+             Call set_belongs_to_association_id method on table object with write mode 
+           (instantiated by create_with_create_write_non_blocking_lock or 
+           create_with_write_non_blocking_lock). 
+             It expects the id of the table record, association id name and association id.  
+
+           e.g.1.
+
+             begin
+               write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock("table.txt")
+
+               id = "3"
+               write_table.set_belongs_to_association_id(id, "register_id", 78)
+             ensure
+               write_table.close unless write_table.nil?
+             end        
+
+           e.g.2.
+
+             begin
+               write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock("table.txt")
+
+               id = "3"
+               write_table.set_belongs_to_association_id(id, "register_id", "78")
+             ensure
+               write_table.close unless write_table.nil?
+             end   
+
+      2-5-6. :keys_for_has_many_association option for query methods.
+
+             All the query methods accepts :keys_for_has_many_association option as in 
+           all_by_has_many_association_id in 2-5-4. above. 
+             i.e. all, find, all_by_key_value, all_by_multiple_key_values, and 
+           all_by_has_many_association_id methods
+
+          e.g.
+
+            begin
+              read_table = TokyoWrapper::Table.create_with_read_non_locking(@table_file)      
+                                      
+              records = read_table.all(:keys_for_has_many_association => ["sector_ids"])
+             ensure
+               read_table.close unless read_table.nil?
+             end    
+
+             -> records: [{:pk => 1, "street" => "1111 Main", "sector_ids" => ["2","5","32","8"]}, 
+                          {:pk => 2, "street" => "1122 Main", "sector_ids" => ["1","2","3458","9"]}]          
+
+
 == Licence
 
 Copyright (c) 2010, Tadatoshi Takahashi

@@ -64,13 +64,6 @@ module TokyoWrapper
       end
       convert_values_to_array_for_keys(result, options[:keys_for_has_many_association])
     end
-
-    def all_by_key_value(key, value, options = {})
-      result = @table.query do |query|
-        query.add key, :equals, value
-      end
-      convert_values_to_array_for_keys_for_multiple_key_value_hashes(result, options[:keys_for_has_many_association])
-    end
     
   end
 
