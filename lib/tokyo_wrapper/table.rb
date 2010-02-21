@@ -13,31 +13,30 @@ module TokyoWrapper
       @table = table
     end
   
-    def self.create_with_create_write_non_blocking_lock(file)
-      create(file, "cwf")
+    def self.create_with_create_write_non_blocking_lock(file, &block)
+      create(file, "cwf", &block)
     end  
   
-    def self.create_with_write_non_blocking_lock(file)
-      create(file, "wf")
+    def self.create_with_write_non_blocking_lock(file, &block)
+      create(file, "wf", &block)
     end
   
-    def self.create_with_read_non_locking(file)
-      create(file, "re")
+    def self.create_with_read_non_locking(file, &block)
+      create(file, "re", &block)
     end
-    
+
     def self.create(file, mode, &block)
-      if block.nil?
-        table = Rufus::Tokyo::Table.new(File.expand_path(file), :mode => mode)
-        tokyo_wrapper_table = new(table)
-      else
+      if block_given?
         begin
           table = Rufus::Tokyo::Table.new(File.expand_path(file), :mode => mode)
-          tokyo_wrapper_table = new(table)
+          return_value_from_block = block.call(new(table))
         ensure
           table.close unless table.nil?
         end
+        return_value_from_block
+      else
+        new(Rufus::Tokyo::Table.new(File.expand_path(file), :mode => mode))
       end
-      tokyo_wrapper_table
     end
 
     private_class_method :new, :create    

@@ -76,16 +76,29 @@
              Use when table file already exists and you want to read data from it. 
              It doesn't lock the table. 
 
-    2-2. Table object must be closed when all the operations are done by calling close method. 
+    2-2. Closing table. 
 
-         e.g. 
+      2-2-1. Table object must be closed when all the operations are done by calling close method. 
 
-           begin
-             write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock("table.txt")
+           e.g. 
+
+             begin
+               write_table = TokyoWrapper::Table.create_with_create_write_non_blocking_lock("table.txt")
   
-           ensure
-             write_table.close unless write_table.nil?
-           end
+             ensure
+               write_table.close unless write_table.nil?
+             end
+  
+      2-2-2. Alternatively, you can pass a block with the operations to a create method. 
+             It is ensured that the table is closed. 
+             The return value is the return value from the block.
+
+           e.g. This acts same as the example for 2-2-1. above 
+              except that the return value is the last value in the block.
+
+             TokyoWrapper::Table.create_with_create_write_non_blocking_lock("table.txt") do |write_table|
+
+             end
 
     2-3. Basic operations. (Defined in TokyoWrapper::Table class itself.)
 
@@ -108,6 +121,17 @@
                id = write_table.add(data_hash)
              ensure
                write_table.close unless write_table.nil?
+             end        
+
+           e.g. This acts exactly same as the example above.
+
+             id = TokyoWrapper::Table.create_with_create_write_non_blocking_lock("table.txt") do |write_table|
+
+               data_hash = {"street" => "1111 Main", 
+                            "city" => "Montreal", 
+                            "notes" => "Some notes"}
+               write_table.add(data_hash)
+
              end        
   
       2-3-2. Updating data. 
