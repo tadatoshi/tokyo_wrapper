@@ -342,25 +342,25 @@ describe TokyoWrapper::Table do
     
     it "should add data by providing the code to do so in the block" do
       
-      # TokyoWrapper::Table.create_with_create_write_non_blocking_lock(@table_file) do |write_table|
-      #   data_hash = {"street" => "1111 Main", 
-      #                "city" => "Montreal", 
-      #                "notes" => "Some notes"}
-      #   id = write_table.add(data_hash)
-      # end
-      # 
-      # TokyoWrapper::Table.create_with_read_non_locking(@table_file) do |read_table|
-      # 
-      #   read_table.all.should == [{:pk => id.to_s,
-      #                              "street" => "1111 Main", 
-      #                              "city" => "Montreal", 
-      #                              "notes" => "Some notes"}]
-      #                                 
-      #   read_table.find(id).should == {"street" => "1111 Main", 
-      #                                  "city" => "Montreal", 
-      #                                  "notes" => "Some notes"} 
-      #                                  
-      # end           
+      TokyoWrapper::Table.create_with_create_write_non_blocking_lock(@table_file) do |write_table|
+        data_hash = {"street" => "1111 Main", 
+                     "city" => "Montreal", 
+                     "notes" => "Some notes"}
+        id = write_table.add(data_hash)
+      end
+      
+      TokyoWrapper::Table.create_with_read_non_locking(@table_file) do |read_table|
+
+        read_table.all.should == [{:pk => id.to_s,
+                                   "street" => "1111 Main", 
+                                   "city" => "Montreal", 
+                                   "notes" => "Some notes"}]
+                                      
+        read_table.find(id).should == {"street" => "1111 Main", 
+                                       "city" => "Montreal", 
+                                       "notes" => "Some notes"} 
+                                       
+      end           
       
     end    
   end

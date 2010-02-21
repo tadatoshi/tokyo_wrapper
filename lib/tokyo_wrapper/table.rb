@@ -25,11 +25,21 @@ module TokyoWrapper
       create(file, "re")
     end
     
-    def self.create(file, mode)
-      table = Rufus::Tokyo::Table.new(File.expand_path(file), :mode => mode)
-      new(table)
+    def self.create(file, mode, &block)
+      if block.nil?
+        table = Rufus::Tokyo::Table.new(File.expand_path(file), :mode => mode)
+        tokyo_wrapper_table = new(table)
+      else
+        begin
+          table = Rufus::Tokyo::Table.new(File.expand_path(file), :mode => mode)
+          tokyo_wrapper_table = new(table)
+        ensure
+          table.close unless table.nil?
+        end
+      end
+      tokyo_wrapper_table
     end
-    
+
     private_class_method :new, :create    
 
     def close
