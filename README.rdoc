@@ -37,11 +37,19 @@
 
   rufus-tokyo 1.0.1 or above. 
 
-  sudo gem install rufus-tokyo --source http://gemcutter.org
+  sudo gem install ffi --source http://rubygems.org
+  sudo gem install rufus-tokyo --source http://rubygems.org
+
+  When using Ruby installation through Ruby Version Manager (RVM):
+  gem install ffi --source http://rubygems.org
+  gem install rufus-tokyo --source http://rubygems.org
 
 == Install
 
-  sudo gem install tokyo_wrapper --source http://gemcutter.org
+  sudo gem install tokyo_wrapper --source http://rubygems.org
+
+  When using Ruby installation through Ruby Version Manager (RVM):
+  gem install tokyo_wrapper --source http://rubygems.org
 
 == Usage
 
@@ -98,7 +106,7 @@
 
              TokyoWrapper::Table.create_with_create_write_non_blocking_lock("table.txt") do |write_table|
 
-             end
+             end        # The table is closed automatically here. 
 
     2-3. Basic operations. (Defined in TokyoWrapper::Table class itself.)
 
@@ -132,7 +140,7 @@
                             "notes" => "Some notes"}
                write_table.add(data_hash)
 
-             end        
+             end        # The table is closed automatically here.         
   
       2-3-2. Updating data. 
 
