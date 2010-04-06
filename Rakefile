@@ -1,3 +1,6 @@
 require 'rubygems'
 require 'rake'
-require 'spec/autorun'
+begin
+  require 'spec/autorun'
+rescue LoadError
+end

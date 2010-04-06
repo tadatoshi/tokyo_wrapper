@@ -1,3 +1,4 @@
 pkg
 tmp
 tokyo_wrapper-*.gem
+.DS_Store
