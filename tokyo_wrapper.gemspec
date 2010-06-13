@@ -24,9 +24,13 @@ Gem::Specification.new do |s|
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION  
     s.specification_version = 3  
         
-    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then  
-    else  
-    end  
+    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<ffi>, [">= 0.4.0"]) 
+      s.add_runtime_dependency(%q<rufus-tokyo>, [">= 1.0.1"])  
+    else
+      s.add_dependency(%q<ffi>, [">= 0.4.0"])
+      s.add_dependency(%q<rufus-tokyo>, [">= 1.0.1"]) 
+    end
   else  
   end  
-end  
+end
