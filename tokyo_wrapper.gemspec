@@ -2,11 +2,11 @@ require 'rake'
 
 Gem::Specification.new do |s|  
   s.name = %q{tokyo_wrapper}  
-  s.version = "0.1.9"  
+  s.version = "0.1.10"  
 
   s.required_rubygems_version = Gem::Requirement.new(">= 1.2") if s.respond_to? :required_rubygems_version=  
   s.authors = ["Tadatoshi Takahashi"]  
-  s.date = %q{2010-02-20}  
+  s.date = %q{2010-06-13}  
   s.description = %q{Collection of convenient methods written on the top of rufus/tokyo to access Tokyo Cabinet}  
   s.email = %q{tadatoshi.3.takahashi@gmail.com}  
   s.extra_rdoc_files = ["README.rdoc", "lib/tokyo_wrapper.rb"]  
@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--line-numbers", "--inline-source", "--title", "Tokyo Wrapper", "--main", "README.rdoc"]  
   s.require_paths = ["lib"]  
   s.rubyforge_project = %q{tokyo_wrapper}  
-  s.rubygems_version = %q{1.3.5}  
+  s.rubygems_version = %q{1.3.7}  
   s.summary = %q{Collection of convenient methods written on the top of rufus/tokyo to access Tokyo Cabinet}  
 
   if s.respond_to? :specification_version then  
