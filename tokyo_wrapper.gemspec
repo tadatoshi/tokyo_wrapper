@@ -31,6 +31,8 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<ffi>, [">= 0.4.0"])
       s.add_dependency(%q<rufus-tokyo>, [">= 1.0.1"]) 
     end
-  else  
+  else
+    s.add_dependency(%q<ffi>, [">= 0.4.0"])
+    s.add_dependency(%q<rufus-tokyo>, [">= 1.0.1"])    
   end  
 end
